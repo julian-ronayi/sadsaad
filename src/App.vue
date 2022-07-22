@@ -23,6 +23,9 @@
               <router-link to="/"><v-tab>Home</v-tab></router-link>
               <router-link to="/beers"><v-tab>Beer List</v-tab></router-link>
               <router-link to="/about"><v-tab>About</v-tab></router-link>
+              <router-link v-if="isLoggedIn" to="/beers/create-beer"><v-tab>Create Beer</v-tab></router-link>
+              <router-link v-if="!isLoggedIn" to="/login"><v-tab>Login</v-tab></router-link>
+              <v-tab v-if="isLoggedIn" @click="logout">Logout</v-tab>
             </div>
           </v-tabs>
         </template>
@@ -39,10 +42,28 @@
     </v-card>
     </v-app>
   </template>
+
 <script>
+
+import { mapState } from 'vuex';
 
 export default {
   name: 'AppComponent',
+  computed: {
+    ...mapState({
+      isLoggedIn: state => state.isLoggedIn
+    })
+  },
+  mounted() {
+    const token = localStorage.getItem('token')
+    this.$store.dispatch('checkToken', token);
+  },
+  methods: {
+    logout() {
+      this.$store.dispatch('logout');
+      this.$route.push({ path: '/' });
+    }
+  }
 }
 
 </script>

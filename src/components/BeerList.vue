@@ -10,10 +10,13 @@
           class="mx-auto"
           max-width="344px"
         >
-          <v-img
-            src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-            height="200px"
-          ></v-img>
+
+          <router-link :to="{ path: '/beers/' + beer._id }">
+            <v-img
+              v-bind:src="beer.photoUrl"
+              height="200px"
+            ></v-img>
+          </router-link>
 
           <v-card-title>
             {{ beer.title }}
@@ -40,6 +43,13 @@
             >
               <v-icon>{{ show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
             </v-btn>
+
+            <router-link v-if="isLoggedIn" :to="{ path: '/beers/' + beer._id + '/edit'}">
+              <v-btn>Edit</v-btn>
+            </router-link>
+
+            <v-btn v-if="isLoggedIn" @click="onDelete(beer._id)">Delete</v-btn>
+
           </v-card-actions>
 
           <v-expand-transition>
@@ -59,12 +69,23 @@
 
 <script>
 
+import { mapState } from 'vuex'
+
 export default {
   name: 'BeerListComponent',
   computed: {
-    beerList () {
-      return this.$store.state.beerList
-    }
+    ...mapState({
+      beerList: state => state.beerList,
+      isLoggedIn: state => state.isLoggedIn
+    })
+  },
+  methods: {
+    onDelete(id) {
+      return this.$store.dispatch('deleteBeer', id);
+    },
+  },
+  mounted() {
+    this.$store.dispatch('fetchBeerList');
   },
 }
 
